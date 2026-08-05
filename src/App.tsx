@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation, Link } from 'react-router-dom';
-import FaultyTerminal from './components/FaultyTerminal';
 import EventSchedule from './components/EventSchedule';
 
 function Home() {
@@ -51,12 +50,13 @@ function Home() {
       `}</style>
 
       <h1 style={{ 
-        fontSize: isMobile ? '2rem' : '2.5rem', 
+        fontSize: isMobile ? '1.5rem' : '2.5rem', 
         fontWeight: '300', 
-        letterSpacing: isMobile ? '4px' : '8px',
+        letterSpacing: isMobile ? '2px' : '8px',
         textTransform: 'uppercase',
         color: 'rgba(255, 255, 255, 0.9)',
-        margin: 0
+        margin: 0,
+        whiteSpace: 'nowrap'
       }}>
         Choose Your Band
       </h1>
@@ -243,31 +243,7 @@ function App() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      fontFamily: '"Geist", "Inter", system-ui, -apple-system, sans-serif',
-      position: 'relative',
-      overflow: 'hidden'
     }}>
-      <FaultyTerminal
-        scale={isMobile ? 1 : 1.5}
-        gridMul={isMobile ? [1, 1] : [2, 1]}
-        digitSize={isMobile ? 1 : 1.2}
-        timeScale={0.2}
-        pause={false}
-        scanlineIntensity={isMobile ? 0 : 0.5}
-        glitchAmount={isMobile ? 0 : 1}
-        flickerAmount={isMobile ? 0 : 1}
-        noiseAmp={isMobile ? 0 : 1}
-        chromaticAberration={0}
-        dither={0}
-        curvature={isMobile ? 0 : 0.5}
-        tint={tintColor}
-        mouseReact={!isMobile}
-        mouseStrength={0.5}
-        pageLoadAnimation={!isMobile}
-        brightness={brightness}
-        dpr={isMobile ? 0.75 : window.devicePixelRatio || 1}
-      />
-
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/red" element={<BandPage color="red" />} />
