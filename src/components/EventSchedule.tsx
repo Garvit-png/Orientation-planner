@@ -11,6 +11,7 @@ interface EventScheduleProps {
 export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showReminder, setShowReminder] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string>('');
   const mainEventRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -52,13 +53,36 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
     return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   };
 
+  const formatDateShort = (dateString: string) => {
+    const d = new Date(dateString);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
   const formatTime = (dateString: string) => {
     const d = new Date(dateString);
     return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
   };
 
-  const mainEvent = activeEvents.length > 0 ? activeEvents[0] : null;
-  const restEvents = activeEvents.slice(1);
+  // Unique dates from active events
+  const uniqueDates = useMemo(() => {
+    const seen = new Set<string>();
+    return activeEvents
+      .map(e => formatDate(e.startTime))
+      .filter(d => { if (seen.has(d)) return false; seen.add(d); return true; });
+  }, [activeEvents]);
+
+  // Auto-select first available date
+  useEffect(() => {
+    if (uniqueDates.length > 0 && (!selectedDate || !uniqueDates.includes(selectedDate))) {
+      setSelectedDate(uniqueDates[0]);
+    }
+  }, [uniqueDates]);
+
+  const filteredEvents = useMemo(() => {
+    return activeEvents.filter(e => formatDate(e.startTime) === selectedDate);
+  }, [activeEvents, selectedDate]);
+
+  const mainEvent = filteredEvents.length > 0 ? filteredEvents[0] : null;
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -125,10 +149,10 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
         </div>
       </div>
 
-      {/* Navigation - Back Button */}
-      <div style={{ padding: '16px 16px 0 16px', flexShrink: 0, maxWidth: '800px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+      {/* Navigation - Back Button + Date Tabs */}
+      <div style={{ padding: '12px 16px 0 16px', flexShrink: 0, maxWidth: '800px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
         <Link to="/" style={{
-          fontSize: '0.75rem',
+          fontSize: '0.7rem',
           letterSpacing: '3px',
           textTransform: 'uppercase',
           textDecoration: 'none',
@@ -142,6 +166,45 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
         >
           ← Back
         </Link>
+
+        {/* Date Tabs */}
+        <div style={{
+          display: 'flex',
+          gap: '8px',
+          marginTop: '14px',
+          flexWrap: 'wrap'
+        }}>
+          {uniqueDates.map(date => {
+            const isActive = date === selectedDate;
+            // Get short label from first event of that date
+            const firstEvent = activeEvents.find(e => formatDate(e.startTime) === date);
+            const label = firstEvent ? formatDateShort(firstEvent.startTime) : date;
+            return (
+              <button
+                key={date}
+                onClick={() => {
+                  setSelectedDate(date);
+                  scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                style={{
+                  background: isActive ? tintColor : 'transparent',
+                  border: `1px solid ${isActive ? tintColor : `${tintColor}50`}`,
+                  borderRadius: '20px',
+                  padding: '5px 14px',
+                  fontSize: '0.75rem',
+                  letterSpacing: '1px',
+                  color: isActive ? '#000' : '#94a3b8',
+                  fontWeight: isActive ? '600' : '400',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  textTransform: 'uppercase'
+                }}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Sticky reminder bar (appears when main event scrolls away) */}
@@ -178,226 +241,127 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
       </div>
 
       <div ref={scrollContainerRef} style={{ flex: 1, overflowY: 'auto', padding: '0 16px', scrollBehavior: 'smooth' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto', width: '100%' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto', width: '100%', paddingTop: '8px' }}>
 
-        {/* ── MAIN EVENT ── */}
-        {mainEvent && (
-          <div ref={mainEventRef} style={{ 
-            minHeight: '85vh', 
-            display: 'flex', 
-            flexDirection: 'column', 
-            justifyContent: 'center',
-            padding: '2rem 0'
-          }}>
-            <div style={{
-              background: 'rgba(0,0,0,0.4)',
-              border: `1px solid ${tintColor}40`,
-              borderRadius: '24px',
-              padding: '2.5rem',
-              backdropFilter: 'blur(10px)',
-              boxShadow: `0 8px 32px 0 rgba(0,0,0,0.3)`,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              textAlign: 'center'
-            }}>
-
-
-            {/* Status - BIGGER */}
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '10px',
-              marginBottom: '1.2rem',
-              fontSize: '1.1rem',
-              letterSpacing: '4px',
-              textTransform: 'uppercase',
-              color: mainStatus === 'LIVE' ? '#6ee7b7' : tintColor,
-              fontWeight: '700'
-            }}>
-              <span style={{
-                width: '10px',
-                height: '10px',
-                borderRadius: '50%',
-                background: mainStatus === 'LIVE' ? '#6ee7b7' : tintColor,
-                animation: mainStatus === 'LIVE' ? 'pulse-dot 1.5s infinite' : 'none'
-              }} />
-              {mainStatus}
-            </div>
-
-            {/* Event Name */}
-            <h2 style={{
-              margin: '0 0 1rem 0',
-              fontSize: '2.5rem',
-              fontWeight: '500',
-              letterSpacing: '1px',
-              color: '#ffffff',
-              lineHeight: 1.2
-            }}>
-              {mainEvent.title}
-            </h2>
-
-            {/* Time & Location */}
-            <div style={{
-              fontSize: '1.1rem',
-              color: '#cbd5e1',
-              lineHeight: 2,
-              fontWeight: '300'
-            }}>
-              <div>{formatTime(mainEvent.startTime)} — {formatTime(mainEvent.endTime)}</div>
-              <div>{mainEvent.location}</div>
-            </div>
-
-            {mainEvent.description && (
-              <p style={{
-                margin: '1.5rem 0 0 0',
-                fontSize: '1rem',
-                color: '#94a3b8',
-                lineHeight: 1.6,
-                fontWeight: '300',
-                maxWidth: '550px'
-              }}>
-                {mainEvent.description}
-              </p>
-            )}
-            </div>
-
-            {/* Scroll hint at bottom */}
-            {restEvents.length > 0 && (
-              <div style={{
-                marginTop: 'auto',
-                paddingTop: '2rem',
-                textAlign: 'center',
-                fontSize: '0.7rem',
-                letterSpacing: '3px',
-                textTransform: 'uppercase',
-                color: '#475569',
-                animation: 'bounce 2s infinite'
-              }}>
-                ↓ Scroll for more
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ── SEPARATOR ── */}
-        {restEvents.length > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '0 0 2rem 0' }}>
-            <div style={{ height: '1px', flex: 1, background: `${tintColor}40` }} />
-            <span style={{ fontSize: '0.7rem', letterSpacing: '4px', textTransform: 'uppercase', color: tintColor, fontWeight: '500' }}>
-              Next
-            </span>
-            <div style={{ height: '1px', flex: 1, background: `${tintColor}40` }} />
-          </div>
-        )}
-
-        {/* ── REST OF THE TIMELINE ── */}
-        {restEvents.map((event, index) => {
+        {/* ── UNIFIED TIMELINE ── */}
+        {filteredEvents.map((event, index) => {
           const status = getStatus(event);
-          const isNewDate = index === 0 || formatDate(event.startTime) !== formatDate(restEvents[index - 1].startTime);
 
           return (
             <React.Fragment key={event.id}>
-              {isNewDate && (
-                <div style={{
-                  fontSize: '0.75rem',
-                  letterSpacing: '3px',
-                  textTransform: 'uppercase',
-                  color: '#64748b',
-                  margin: index === 0 ? '0 0 1.25rem 0' : '2rem 0 1.25rem 0'
-                }}>
-                  {formatDate(event.startTime)}
-                </div>
-              )}
 
               <div style={{
                 display: 'flex',
                 alignItems: 'stretch',
-                gap: '16px',
-                marginBottom: '1rem'
+                gap: '0',
+                marginBottom: '0'
               }}>
-                {/* Timeline dot & vertical line */}
+                {/* LEFT: Time sidebar */}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-end',
+                  minWidth: '80px',
+                  paddingRight: '12px',
+                  paddingTop: '18px'
+                }}>
+                  <div style={{
+                    fontSize: '0.8rem',
+                    color: '#ffffff',
+                    fontWeight: '400',
+                    fontVariantNumeric: 'tabular-nums',
+                    letterSpacing: '0.5px',
+                    whiteSpace: 'nowrap',
+                    lineHeight: 1.4
+                  }}>
+                    {formatTime(event.startTime)}
+                  </div>
+                  <div style={{
+                    fontSize: '0.75rem',
+                    color: `${tintColor}99`,
+                    fontWeight: '300',
+                    fontVariantNumeric: 'tabular-nums',
+                    whiteSpace: 'nowrap',
+                    lineHeight: 1.4
+                  }}>
+                    {formatTime(event.endTime)}
+                  </div>
+                </div>
+
+                {/* CENTER: Vertical line + dot */}
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  minWidth: '20px'
+                  width: '28px',
+                  flexShrink: 0
                 }}>
+                  {/* Connector line from previous */}
+                  <div style={{
+                    width: '1px',
+                    height: index === 0 ? '6px' : '18px',
+                    background: index === 0 ? 'transparent' : `${tintColor}40`,
+                    flexShrink: 0
+                  }} />
+                  {/* Dot */}
                   <div style={{
                     width: '9px',
                     height: '9px',
                     borderRadius: '50%',
                     background: status === 'LIVE' ? '#6ee7b7' : tintColor,
                     animation: status === 'LIVE' ? 'pulse-dot 1.5s infinite' : 'none',
-                    marginTop: '28px',
-                    position: 'relative',
-                    zIndex: 2
+                    flexShrink: 0,
+                    zIndex: 2,
+                    position: 'relative'
                   }} />
-                  {index !== restEvents.length - 1 && (
-                    <div style={{
-                      width: '1px',
-                      flex: 1,
-                      background: `${tintColor}30`,
-                      marginTop: '8px',
-                      marginBottom: '-16px' // reach the next item
-                    }} />
-                  )}
+                  {/* Connector line to next */}
+                  <div style={{
+                    width: '1px',
+                    flex: 1,
+                    minHeight: '16px',
+                    background: index === filteredEvents.length - 1 ? 'transparent' : `${tintColor}40`,
+                    marginTop: '6px'
+                  }} />
                 </div>
 
-                {/* Event Card */}
+                {/* RIGHT: Event info */}
                 <div style={{
                   flex: 1,
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'flex-start',
                   textAlign: 'left',
-                  gap: '12px',
-                  padding: '1.25rem',
-                  background: 'rgba(0,0,0,0.3)',
-                  border: `1px solid ${tintColor}30`,
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px 0 rgba(0,0,0,0.2)'
+                  padding: '12px 12px 20px 16px'
                 }}>
                   {/* Status badge */}
                   <div style={{
-                    fontSize: '0.75rem',
+                    fontSize: '0.65rem',
                     letterSpacing: '2px',
                     textTransform: 'uppercase',
                     color: status === 'LIVE' ? '#6ee7b7' : '#64748b',
-                    fontWeight: '700',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px'
+                    fontWeight: '600',
+                    marginBottom: '6px'
                   }}>
                     {status}
                   </div>
-
-                  {/* Event info */}
-                  <div>
-                    <div style={{
-                      fontSize: '1.15rem',
-                      fontWeight: '400',
-                      color: '#e2e8f0',
-                      marginBottom: '6px',
-                      letterSpacing: '0.5px'
-                    }}>
-                      {event.title}
-                    </div>
-                    <div style={{
-                      fontSize: '0.9rem',
-                      color: '#94a3b8',
-                      fontWeight: '300'
-                    }}>
-                      {formatTime(event.startTime)} — {formatTime(event.endTime)}
-                    </div>
-                    <div style={{
-                      fontSize: '0.9rem',
-                      color: '#94a3b8',
-                      fontWeight: '300',
-                      marginTop: '4px'
-                    }}>
-                      {event.location}
-                    </div>
+                  {/* Event name */}
+                  <div style={{
+                    fontSize: '1rem',
+                    fontWeight: '400',
+                    color: '#e2e8f0',
+                    letterSpacing: '0.3px',
+                    marginBottom: '4px',
+                    lineHeight: 1.3
+                  }}>
+                    {event.title}
+                  </div>
+                  {/* Location */}
+                  <div style={{
+                    fontSize: '0.85rem',
+                    color: '#64748b',
+                    fontWeight: '300'
+                  }}>
+                    {event.location}
                   </div>
                 </div>
               </div>
@@ -414,10 +378,6 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
         @keyframes pulse-dot {
           0%, 100% { opacity: 1; transform: scale(1); }
           50% { opacity: 0.4; transform: scale(1.5); }
-        }
-        @keyframes bounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(6px); }
         }
       `}</style>
     </div>
