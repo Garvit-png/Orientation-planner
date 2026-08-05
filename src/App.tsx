@@ -248,23 +248,24 @@ function App() {
       overflow: 'hidden'
     }}>
       <FaultyTerminal
-        scale={1.5}
+        scale={isMobile ? 1 : 1.5}
         gridMul={isMobile ? [1, 1] : [2, 1]}
-        digitSize={1.2}
+        digitSize={isMobile ? 1 : 1.2}
         timeScale={0.2}
         pause={false}
-        scanlineIntensity={isMobile ? 0.2 : 0.5}
-        glitchAmount={1}
-        flickerAmount={1}
-        noiseAmp={1}
+        scanlineIntensity={isMobile ? 0 : 0.5}
+        glitchAmount={isMobile ? 0 : 1}
+        flickerAmount={isMobile ? 0 : 1}
+        noiseAmp={isMobile ? 0 : 1}
         chromaticAberration={0}
         dither={0}
         curvature={isMobile ? 0 : 0.5}
         tint={tintColor}
         mouseReact={!isMobile}
         mouseStrength={0.5}
-        pageLoadAnimation
+        pageLoadAnimation={!isMobile}
         brightness={brightness}
+        dpr={isMobile ? 0.75 : window.devicePixelRatio || 1}
       />
 
       <Routes>
