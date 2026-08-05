@@ -41,10 +41,11 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
     return allEvents.filter(event => new Date(event.endTime) >= currentTime);
   }, [allEvents, currentTime]);
 
-  const getStatus = useCallback((event: ScheduleEvent): 'LIVE' | 'UPCOMING' => {
+  const getStatus = useCallback((event: ScheduleEvent): 'LIVE' | 'UPCOMING' | 'PAST' => {
     const start = new Date(event.startTime);
     const end = new Date(event.endTime);
     if (currentTime >= start && currentTime <= end) return 'LIVE';
+    if (currentTime > end) return 'PAST';
     return 'UPCOMING';
   }, [currentTime]);
 
@@ -63,6 +64,10 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
     return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
   };
 
+  const pastEvents = useMemo(() => {
+    return allEvents.filter(event => new Date(event.endTime) < currentTime);
+  }, [allEvents, currentTime]);
+
   // Unique dates from active events
   const uniqueDates = useMemo(() => {
     const seen = new Set<string>();
@@ -73,16 +78,18 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
 
   // Auto-select first available date
   useEffect(() => {
-    if (uniqueDates.length > 0 && (!selectedDate || !uniqueDates.includes(selectedDate))) {
+    if (selectedDate !== 'PAST' && uniqueDates.length > 0 && (!selectedDate || !uniqueDates.includes(selectedDate))) {
       setSelectedDate(uniqueDates[0]);
     }
-  }, [uniqueDates]);
+  }, [uniqueDates, selectedDate]);
 
   const filteredEvents = useMemo(() => {
+    if (selectedDate === 'PAST') return pastEvents;
     return activeEvents.filter(e => formatDate(e.startTime) === selectedDate);
-  }, [activeEvents, selectedDate]);
+  }, [activeEvents, pastEvents, selectedDate]);
 
-  const mainEvent = filteredEvents.length > 0 ? filteredEvents[0] : null;
+  // Find the currently active or next upcoming event across all dates for the reminder bar
+  const mainEvent = activeEvents.length > 0 ? activeEvents[0] : null;
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -177,7 +184,7 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
           {uniqueDates.map(date => {
             const isActive = date === selectedDate;
             // Get short label from first event of that date
-            const firstEvent = activeEvents.find(e => formatDate(e.startTime) === date);
+            const firstEvent = allEvents.find(e => formatDate(e.startTime) === date);
             const label = firstEvent ? formatDateShort(firstEvent.startTime) : date;
             return (
               <button
@@ -204,6 +211,31 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
               </button>
             );
           })}
+          
+          {/* Past Tab */}
+          {pastEvents.length > 0 && (
+            <button
+              onClick={() => {
+                setSelectedDate('PAST');
+                scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              style={{
+                background: selectedDate === 'PAST' ? tintColor : 'transparent',
+                border: `1px solid ${selectedDate === 'PAST' ? tintColor : `${tintColor}50`}`,
+                borderRadius: '20px',
+                padding: '5px 14px',
+                fontSize: '0.75rem',
+                letterSpacing: '1px',
+                color: selectedDate === 'PAST' ? '#000' : '#94a3b8',
+                fontWeight: selectedDate === 'PAST' ? '600' : '400',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                textTransform: 'uppercase'
+              }}
+            >
+              Past Sessions
+            </button>
+          )}
         </div>
       </div>
 
@@ -246,45 +278,36 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
         {/* ── UNIFIED TIMELINE ── */}
         {filteredEvents.map((event, index) => {
           const status = getStatus(event);
+          const isMainEvent = event.id === mainEvent?.id;
 
           return (
             <React.Fragment key={event.id}>
-
               <div style={{
                 display: 'flex',
                 alignItems: 'stretch',
                 gap: '0',
-                marginBottom: '0'
+                marginBottom: '0',
+                opacity: !isMainEvent ? 0.6 : 1
               }}>
                 {/* LEFT: Time sidebar */}
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'flex-end',
-                  minWidth: '80px',
-                  paddingRight: '12px',
-                  paddingTop: '18px'
+                  minWidth: '7.5rem',
+                  paddingRight: '0.75rem',
+                  paddingTop: '1.125rem'
                 }}>
                   <div style={{
                     fontSize: '0.8rem',
-                    color: '#ffffff',
+                    color: !isMainEvent ? '#94a3b8' : '#ffffff',
                     fontWeight: '400',
                     fontVariantNumeric: 'tabular-nums',
                     letterSpacing: '0.5px',
                     whiteSpace: 'nowrap',
                     lineHeight: 1.4
                   }}>
-                    {formatTime(event.startTime)}
-                  </div>
-                  <div style={{
-                    fontSize: '0.75rem',
-                    color: `${tintColor}99`,
-                    fontWeight: '300',
-                    fontVariantNumeric: 'tabular-nums',
-                    whiteSpace: 'nowrap',
-                    lineHeight: 1.4
-                  }}>
-                    {formatTime(event.endTime)}
+                    {formatTime(event.startTime)} - {formatTime(event.endTime)}
                   </div>
                 </div>
 
@@ -293,22 +316,22 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  width: '28px',
+                  width: '1.75rem',
                   flexShrink: 0
                 }}>
                   {/* Connector line from previous */}
                   <div style={{
                     width: '1px',
-                    height: index === 0 ? '6px' : '18px',
-                    background: index === 0 ? 'transparent' : `${tintColor}40`,
+                    height: index === 0 ? '0.375rem' : '1.125rem',
+                    background: index === 0 ? 'transparent' : (!isMainEvent ? '#475569' : `${tintColor}40`),
                     flexShrink: 0
                   }} />
                   {/* Dot */}
                   <div style={{
-                    width: '9px',
-                    height: '9px',
+                    width: '0.5625rem',
+                    height: '0.5625rem',
                     borderRadius: '50%',
-                    background: status === 'LIVE' ? '#6ee7b7' : tintColor,
+                    background: status === 'LIVE' ? '#6ee7b7' : (!isMainEvent ? '#64748b' : tintColor),
                     animation: status === 'LIVE' ? 'pulse-dot 1.5s infinite' : 'none',
                     flexShrink: 0,
                     zIndex: 2,
@@ -318,29 +341,29 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
                   <div style={{
                     width: '1px',
                     flex: 1,
-                    minHeight: '16px',
-                    background: index === filteredEvents.length - 1 ? 'transparent' : `${tintColor}40`,
-                    marginTop: '6px'
+                    minHeight: '1rem',
+                    background: index === filteredEvents.length - 1 ? 'transparent' : (!isMainEvent ? '#475569' : `${tintColor}40`),
+                    marginTop: '0.375rem'
                   }} />
                 </div>
 
-                {/* RIGHT: Event info */}
+                {/* RIGHT: Event card */}
                 <div style={{
                   flex: 1,
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'flex-start',
                   textAlign: 'left',
-                  padding: '12px 12px 20px 16px'
+                  padding: '0.75rem 0.75rem 1.25rem 1rem'
                 }}>
                   {/* Status badge */}
                   <div style={{
                     fontSize: '0.65rem',
                     letterSpacing: '2px',
                     textTransform: 'uppercase',
-                    color: status === 'LIVE' ? '#6ee7b7' : '#64748b',
+                    color: status === 'LIVE' ? '#6ee7b7' : (!isMainEvent ? '#64748b' : tintColor),
                     fontWeight: '600',
-                    marginBottom: '6px'
+                    marginBottom: '0.375rem'
                   }}>
                     {status}
                   </div>
@@ -348,9 +371,9 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
                   <div style={{
                     fontSize: '1rem',
                     fontWeight: '400',
-                    color: '#e2e8f0',
+                    color: !isMainEvent ? '#94a3b8' : '#e2e8f0',
                     letterSpacing: '0.3px',
-                    marginBottom: '4px',
+                    marginBottom: '0.25rem',
                     lineHeight: 1.3
                   }}>
                     {event.title}
