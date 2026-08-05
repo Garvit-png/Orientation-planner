@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate, useLocation, Link } from 'react-router-dom';
+import { Routes, Route, useNavigate, Link } from 'react-router-dom';
 import EventSchedule from './components/EventSchedule';
 
 function Home() {
@@ -213,25 +213,6 @@ function BandPage({ color }: { color: 'red' | 'blue' }) {
 }
 
 function App() {
-  const location = useLocation();
-  const [isMobile, setIsMobile] = useState(false);
-  
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  const path = location.pathname.toLowerCase();
-  const isRed = path === '/red';
-  const isBlue = path === '/blue';
-  
-  const tintColor = isRed ? '#ff3333' : isBlue ? '#3388ff' : '#ffffff';
-  const brightness = isRed || isBlue ? 0.3 : 0.25;
-
   return (
     <div style={{
       margin: 0,
