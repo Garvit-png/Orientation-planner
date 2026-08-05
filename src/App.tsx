@@ -178,31 +178,19 @@ function BandPage({ color }: { color: 'red' | 'blue' }) {
       textAlign: 'left',
       display: 'flex',
       flexDirection: 'column',
-      padding: isMobile ? '1rem' : '2rem 3rem',
-      width: '100%',
-      maxWidth: '700px',
+      padding: isMobile ? '0' : '0 3rem',
+      width: '100vw',
       opacity: isLoaded ? 1 : 0,
       transform: isLoaded ? 'translateY(0)' : 'translateY(10px)',
       transition: 'all 0.6s ease',
       height: '100vh',
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
+      background: isRed 
+        ? 'radial-gradient(circle at center, rgba(80, 0, 0, 0.4) 0%, #000 100%)' 
+        : isBlue 
+          ? 'radial-gradient(circle at center, rgba(0, 40, 120, 0.4) 0%, #000 100%)' 
+          : '#000'
     }}>
-      {/* Tiny back link */}
-      <div style={{ flexShrink: 0, paddingTop: isMobile ? '0.5rem' : '0', marginBottom: '0.5rem' }}>
-        <Link to="/" style={{
-          fontSize: '0.7rem',
-          letterSpacing: '3px',
-          textTransform: 'uppercase',
-          textDecoration: 'none',
-          color: '#475569',
-          transition: 'color 0.2s ease'
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.color = '#94a3b8')}
-        onMouseLeave={(e) => (e.currentTarget.style.color = '#475569')}
-        >
-          ← Back
-        </Link>
-      </div>
 
       {/* Schedule UI */}
       <div style={{ flex: 1, width: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
