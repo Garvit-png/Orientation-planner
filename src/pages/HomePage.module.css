@@ -1,0 +1,201 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem;
+  padding: 1.5rem 1rem 4rem;
+  background-color: #000;
+  min-height: 100vh;
+  color: #fff;
+}
+
+/* Date Banner */
+.dateBanner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 100px;
+  padding: 0.5rem 1.25rem;
+  backdrop-filter: blur(8px);
+}
+
+.dateIcon {
+  font-size: 1rem;
+}
+
+.dateText {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.02em;
+}
+
+/* Pill Section */
+.pillSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.heading {
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-align: center;
+  color: #fff;
+}
+
+.subheading {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+}
+
+/* Image + Hotspots */
+.pillWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  user-select: none;
+}
+
+.pillImage {
+  width: 100%;
+  border-radius: 1rem;
+  display: block;
+}
+
+/* Hotspot base */
+.hotspot {
+  position: absolute;
+  width: 38%;
+  height: 28%;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: transform 0.2s;
+}
+
+.hotspot:hover {
+  transform: scale(1.05);
+}
+
+.hotspot:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 4px;
+}
+
+/* Blue hotspot — left hand */
+.blueHotspot {
+  left: 2%;
+  top: 48%;
+}
+
+.blueHotspot .hotspotRipple {
+  background: rgba(59, 130, 246, 0.25);
+  border: 2px solid rgba(59, 130, 246, 0.7);
+}
+
+.blueHotspot:hover .hotspotRipple {
+  background: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 32px 8px rgba(59, 130, 246, 0.5);
+}
+
+.blueHotspot .hotspotLabel {
+  color: #60a5fa;
+}
+
+/* Red hotspot — right hand */
+.redHotspot {
+  right: 2%;
+  top: 48%;
+}
+
+.redHotspot .hotspotRipple {
+  background: rgba(239, 68, 68, 0.25);
+  border: 2px solid rgba(239, 68, 68, 0.7);
+}
+
+.redHotspot:hover .hotspotRipple {
+  background: rgba(239, 68, 68, 0.4);
+  box-shadow: 0 0 32px 8px rgba(239, 68, 68, 0.5);
+}
+
+.redHotspot .hotspotLabel {
+  color: #f87171;
+}
+
+/* Ripple circle */
+.hotspotRipple {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  transition: background 0.3s, box-shadow 0.3s;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.blueHotspot .hotspotRipple {
+  animation-name: pulseBlue;
+}
+
+.redHotspot .hotspotRipple {
+  animation-name: pulseRed;
+}
+
+@keyframes pulseBlue {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5); }
+  50%       { box-shadow: 0 0 24px 10px rgba(59, 130, 246, 0.2); }
+}
+
+@keyframes pulseRed {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+  50%       { box-shadow: 0 0 24px 10px rgba(239, 68, 68, 0.2); }
+}
+
+/* Label */
+.hotspotLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Hint line */
+.hint {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 0.5rem;
+}
+
+.blueText { color: #60a5fa; font-weight: 600; }
+.redText  { color: #f87171; font-weight: 600; }
+
+/* Sessions Section */
+.sessionsSection {
+  width: 100%;
+  max-width: 860px;
+}
+
+.sectionTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+  color: rgba(255,255,255,0.85);
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
+.sessionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 1.25rem;
+}

@@ -1,0 +1,43 @@
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: var(--color-text);
+}
+
+.lead {
+  font-size: 1.2rem;
+  color: var(--color-text-muted);
+  margin-bottom: 3rem;
+  line-height: 1.7;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.content h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--color-text);
+}
+
+.content p {
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+
+.techList {
+  color: var(--color-text-muted);
+  line-height: 2;
+  padding-left: 1.5rem;
+}
