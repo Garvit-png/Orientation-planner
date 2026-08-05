@@ -137,7 +137,7 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
         flexShrink: 0
       }}>
         <div style={{
-          fontSize: '0.95rem',
+          fontSize: '0.8rem',
           letterSpacing: '2px',
           textTransform: 'uppercase',
           color: '#e2e8f0',
@@ -146,7 +146,7 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
           {todayDateStr}
         </div>
         <div style={{
-          fontSize: '0.95rem',
+          fontSize: '0.8rem',
           letterSpacing: '1px',
           color: '#e2e8f0',
           fontWeight: '400',
