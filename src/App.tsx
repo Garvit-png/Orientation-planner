@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate, Link } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import EventSchedule from './components/EventSchedule';
 
 function Home() {
