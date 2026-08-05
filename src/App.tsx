@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate, useLocation, Link, useParams } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation, Link } from 'react-router-dom';
 import FaultyTerminal from './components/FaultyTerminal';
 import EventSchedule from './components/EventSchedule';
 
@@ -169,7 +169,6 @@ function BandPage({ color }: { color: 'red' | 'blue' }) {
   const isBlue = color === 'blue';
   
   const tintColor = isRed ? '#ff3333' : isBlue ? '#3388ff' : '#ffffff';
-  const bandName = isRed ? 'Red Band' : isBlue ? 'Blue Band' : 'Unknown Band';
   const bandType = isRed ? 'Red' : 'Blue';
 
   return (

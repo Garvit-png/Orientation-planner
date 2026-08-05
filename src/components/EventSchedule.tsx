@@ -131,7 +131,6 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
           position: 'sticky',
           top: '48px',
           zIndex: 25,
-          padding: '10px 16px',
           background: mainStatus === 'LIVE' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(255,255,255,0.04)',
           borderBottom: `1px solid ${mainStatus === 'LIVE' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.06)'}`,
           cursor: 'pointer',
