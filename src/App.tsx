@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import EventSchedule from './components/EventSchedule';
 
-function Home() {
+function Home({ isDarkMode }: { isDarkMode?: boolean }) {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -54,7 +54,7 @@ function Home() {
         fontWeight: '300', 
         letterSpacing: isMobile ? '2px' : '8px',
         textTransform: 'uppercase',
-        color: 'rgba(0, 0, 0, 0.9)',
+        color: isDarkMode ? '#FFFFFF' : 'rgba(0, 0, 0, 0.9)',
         margin: 0,
         whiteSpace: 'nowrap'
       }}>
@@ -206,7 +206,7 @@ function App() {
     return () => clearInterval(timer);
   }, []);
 
-  const bgColor = isDarkMode ? '#121212' : '#FFF8E7';
+  const bgColor = isDarkMode ? '#121212' : '#FEF5E8';
   const textColor = isDarkMode ? '#f8fafc' : '#1a1a1a';
   const navBgColor = isDarkMode ? '#1e1e1e' : '#FBE6D0';
   const secondaryTextColor = isDarkMode ? '#94a3b8' : '#666';
@@ -270,7 +270,7 @@ function App() {
 
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
         <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home isDarkMode={isDarkMode} />} />
         <Route path="/red" element={<BandPage color="red" isDarkMode={isDarkMode} />} />
         <Route path="/blue" element={<BandPage color="blue" isDarkMode={isDarkMode} />} />
         </Routes>
