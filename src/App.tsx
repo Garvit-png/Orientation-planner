@@ -54,7 +54,7 @@ function Home() {
         fontWeight: '300', 
         letterSpacing: isMobile ? '2px' : '8px',
         textTransform: 'uppercase',
-        color: 'rgba(255, 255, 255, 0.9)',
+        color: 'rgba(0, 0, 0, 0.9)',
         margin: 0,
         whiteSpace: 'nowrap'
       }}>
@@ -144,7 +144,7 @@ function Home() {
   );
 }
 
-function BandPage({ color }: { color: 'red' | 'blue' }) {
+function BandPage({ color, isDarkMode }: { color: 'red' | 'blue', isDarkMode?: boolean }) {
   const [isMobile, setIsMobile] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   
@@ -183,41 +183,98 @@ function BandPage({ color }: { color: 'red' | 'blue' }) {
       opacity: isLoaded ? 1 : 0,
       transform: isLoaded ? 'translateY(0)' : 'translateY(10px)',
       transition: 'all 0.6s ease',
-      height: '100vh',
-      boxSizing: 'border-box',
-      background: isRed 
-        ? 'radial-gradient(circle at center, rgba(80, 0, 0, 0.4) 0%, #000 100%)' 
-        : isBlue 
-          ? 'radial-gradient(circle at center, rgba(0, 40, 120, 0.4) 0%, #000 100%)' 
-          : '#000'
+      height: '100%',
+      boxSizing: 'border-box'
     }}>
 
       {/* Schedule UI */}
       <div style={{ flex: 1, width: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        <EventSchedule band={bandType} tintColor={tintColor} />
+        <EventSchedule band={bandType} tintColor={tintColor} isDarkMode={isDarkMode} />
       </div>
     </div>
   );
 }
 
 function App() {
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const bgColor = isDarkMode ? '#121212' : '#FDF1DE';
+  const textColor = isDarkMode ? '#f8fafc' : '#1a1a1a';
+  const navBgColor = isDarkMode ? '#1e1e1e' : '#FBE6D0';
+  const secondaryTextColor = isDarkMode ? '#94a3b8' : '#666';
+  const buttonBgColor = isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+
   return (
     <div style={{
       margin: 0,
       padding: 0,
       width: '100vw',
       height: '100vh',
-      backgroundColor: '#000',
-      color: '#f8fafc',
+      backgroundColor: bgColor,
+      color: textColor,
       display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
+      flexDirection: 'column',
+      transition: 'background-color 0.3s ease, color 0.3s ease'
     }}>
-      <Routes>
+      {/* Navbar */}
+      <div style={{
+        width: '100%',
+        backgroundColor: navBgColor,
+        padding: '6px 16px',
+        boxSizing: 'border-box',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        boxShadow: isDarkMode ? '0 2px 4px rgba(0,0,0,0.2)' : '0 2px 4px rgba(0,0,0,0.05)',
+        zIndex: 50,
+        transition: 'background-color 0.3s ease'
+      }}>
+        {/* Left Section */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <img 
+            src="/new_logo.png" 
+            alt="Logo" 
+            style={{ width: '26px', height: 'auto', filter: isDarkMode ? 'brightness(0.9)' : 'none' }} 
+          />
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span style={{ fontWeight: '600', fontSize: '0.7rem', color: textColor }}>RU Orientation Portal</span>
+            <span style={{ fontSize: '0.55rem', color: secondaryTextColor }}>#ApproachingRishihood</span>
+          </div>
+        </div>
+
+        {/* Right Section */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* Time Badge */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: buttonBgColor, padding: '4px 10px', borderRadius: '20px', fontSize: '0.65rem', color: textColor, fontWeight: '500' }}>
+            <div style={{ width: '4px', height: '4px', backgroundColor: '#ef4444', borderRadius: '50%' }}></div>
+            {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
+          </div>
+
+          {/* Toggle Button */}
+          <button 
+            onClick={() => setIsDarkMode(!isDarkMode)}
+            style={{ background: buttonBgColor, color: textColor, border: 'none', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '0.75rem', transition: 'background-color 0.2s ease' }}
+          >
+            {isDarkMode ? '☀' : '☾'}
+          </button>
+        </div>
+      </div>
+
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+        <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/red" element={<BandPage color="red" />} />
-        <Route path="/blue" element={<BandPage color="blue" />} />
-      </Routes>
+        <Route path="/red" element={<BandPage color="red" isDarkMode={isDarkMode} />} />
+        <Route path="/blue" element={<BandPage color="blue" isDarkMode={isDarkMode} />} />
+        </Routes>
+      </div>
     </div>
   );
 }

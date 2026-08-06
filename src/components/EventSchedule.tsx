@@ -6,9 +6,10 @@ import { MOCK_SCHEDULE } from '../data/scheduleData';
 interface EventScheduleProps {
   band: Band;
   tintColor: string;
+  isDarkMode?: boolean;
 }
 
-export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
+export default function EventSchedule({ band, tintColor, isDarkMode }: EventScheduleProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showReminder, setShowReminder] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>('');
@@ -111,7 +112,7 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
 
   if (activeEvents.length === 0) {
     return (
-      <div style={{ padding: '3rem 0', textAlign: 'center', color: '#888', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '1rem' }}>
+      <div style={{ padding: '3rem 0', textAlign: 'center', color: isDarkMode ? '#cbd5e1' : '#888', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '1rem' }}>
         No upcoming events
       </div>
     );
@@ -122,39 +123,7 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
 
-      {/* ── STICKY TOP BAR: Date + Live Clock ── */}
-      <div style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 30,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '14px 16px',
-        borderBottom: `1px solid ${tintColor}40`,
-        backdropFilter: 'blur(12px)',
-        background: 'rgba(0,0,0,0.4)',
-        flexShrink: 0
-      }}>
-        <div style={{
-          fontSize: '0.8rem',
-          letterSpacing: '2px',
-          textTransform: 'uppercase',
-          color: '#e2e8f0',
-          fontWeight: '500'
-        }}>
-          {todayDateStr}
-        </div>
-        <div style={{
-          fontSize: '0.8rem',
-          letterSpacing: '1px',
-          color: '#e2e8f0',
-          fontWeight: '400',
-          fontVariantNumeric: 'tabular-nums'
-        }}>
-          {liveTimeStr}
-        </div>
-      </div>
+
 
       {/* Navigation - Back Button + Date Tabs */}
       <div style={{ padding: '12px 16px 0 16px', flexShrink: 0, maxWidth: '800px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
@@ -194,13 +163,13 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
                   scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 style={{
-                  background: isActive ? tintColor : 'transparent',
-                  border: `1px solid ${isActive ? tintColor : `${tintColor}50`}`,
+                  background: 'transparent',
+                  border: `1px solid ${isActive ? tintColor : 'transparent'}`,
                   borderRadius: '20px',
                   padding: '5px 14px',
                   fontSize: '0.75rem',
                   letterSpacing: '1px',
-                  color: isActive ? '#000' : '#94a3b8',
+                  color: isActive ? tintColor : '#94a3b8',
                   fontWeight: isActive ? '600' : '400',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
@@ -220,13 +189,13 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
                 scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
               }}
               style={{
-                background: selectedDate === 'PAST' ? tintColor : 'transparent',
-                border: `1px solid ${selectedDate === 'PAST' ? tintColor : `${tintColor}50`}`,
+                background: 'transparent',
+                border: `1px solid ${selectedDate === 'PAST' ? tintColor : 'transparent'}`,
                 borderRadius: '20px',
                 padding: '5px 14px',
                 fontSize: '0.75rem',
                 letterSpacing: '1px',
-                color: selectedDate === 'PAST' ? '#000' : '#94a3b8',
+                color: selectedDate === 'PAST' ? tintColor : '#94a3b8',
                 fontWeight: selectedDate === 'PAST' ? '600' : '400',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
@@ -246,8 +215,8 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
           position: 'sticky',
           top: '48px',
           zIndex: 25,
-          background: mainStatus === 'LIVE' ? 'rgba(16, 185, 129, 0.12)' : `${tintColor}10`,
-          borderBottom: `1px solid ${mainStatus === 'LIVE' ? 'rgba(16, 185, 129, 0.4)' : `${tintColor}40`}`,
+          background: mainStatus === 'LIVE' ? 'rgba(239, 68, 68, 0.12)' : `${tintColor}10`,
+          borderBottom: `1px solid ${mainStatus === 'LIVE' ? 'rgba(239, 68, 68, 0.4)' : `${tintColor}40`}`,
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
@@ -256,7 +225,7 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
           fontSize: '0.8rem',
           letterSpacing: '2px',
           textTransform: 'uppercase',
-          color: mainStatus === 'LIVE' ? '#6ee7b7' : '#cbd5e1',
+          color: mainStatus === 'LIVE' ? '#ef4444' : (isDarkMode ? '#cbd5e1' : '#334155'),
           opacity: showReminder ? 1 : 0,
           maxHeight: showReminder ? '50px' : '0',
           padding: showReminder ? '10px 16px' : '0 16px',
@@ -267,7 +236,7 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
           fontWeight: '500'
         }}
       >
-        <span style={{ animation: mainStatus === 'LIVE' ? 'pulse-dot 1.5s infinite' : 'none', width: '7px', height: '7px', borderRadius: '50%', background: mainStatus === 'LIVE' ? '#6ee7b7' : '#cbd5e1', display: 'inline-block' }} />
+        <span style={{ animation: mainStatus === 'LIVE' ? 'pulse-dot 1.5s infinite' : 'none', width: '7px', height: '7px', borderRadius: '50%', background: mainStatus === 'LIVE' ? '#ef4444' : '#cbd5e1', display: 'inline-block' }} />
         {mainEvent?.title} — {mainStatus === 'LIVE' ? 'Happening now' : 'Up next'}
         <span style={{ opacity: 0.5 }}>↑</span>
       </div>
@@ -300,7 +269,7 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
                 }}>
                   <div style={{
                     fontSize: '0.8rem',
-                    color: !isMainEvent ? '#94a3b8' : '#ffffff',
+                    color: !isMainEvent ? '#64748b' : (isDarkMode ? '#f8fafc' : '#0f172a'),
                     fontWeight: '400',
                     fontVariantNumeric: 'tabular-nums',
                     letterSpacing: '0.5px',
@@ -331,7 +300,7 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
                     width: '0.5625rem',
                     height: '0.5625rem',
                     borderRadius: '50%',
-                    background: status === 'LIVE' ? '#6ee7b7' : (!isMainEvent ? '#64748b' : tintColor),
+                    background: status === 'LIVE' ? '#ef4444' : (!isMainEvent ? '#64748b' : tintColor),
                     animation: status === 'LIVE' ? 'pulse-dot 1.5s infinite' : 'none',
                     flexShrink: 0,
                     zIndex: 2,
@@ -361,7 +330,7 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
                     fontSize: '0.65rem',
                     letterSpacing: '2px',
                     textTransform: 'uppercase',
-                    color: status === 'LIVE' ? '#6ee7b7' : (!isMainEvent ? '#64748b' : tintColor),
+                    color: status === 'LIVE' ? '#ef4444' : (!isMainEvent ? '#64748b' : tintColor),
                     fontWeight: '600',
                     marginBottom: '0.375rem'
                   }}>
@@ -371,7 +340,7 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
                   <div style={{
                     fontSize: '1rem',
                     fontWeight: '400',
-                    color: !isMainEvent ? '#94a3b8' : '#e2e8f0',
+                    color: !isMainEvent ? '#64748b' : (isDarkMode ? '#f8fafc' : '#0f172a'),
                     letterSpacing: '0.3px',
                     marginBottom: '0.25rem',
                     lineHeight: 1.3
@@ -381,7 +350,7 @@ export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
                   {/* Location */}
                   <div style={{
                     fontSize: '0.85rem',
-                    color: '#64748b',
+                    color: isDarkMode ? '#94a3b8' : '#64748b',
                     fontWeight: '300'
                   }}>
                     {event.location}
