@@ -24,14 +24,6 @@ export default function EventSchedule({ band, tintColor, isDarkMode }: EventSche
     return () => clearInterval(timer);
   }, []);
 
-  const liveTimeStr = currentTime.toLocaleTimeString('en-US', {
-    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
-  });
-
-  const todayDateStr = currentTime.toLocaleDateString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric'
-  });
-
   const allEvents = useMemo(() => {
     return MOCK_SCHEDULE
       .filter(event => event.band === band || event.band === 'Both')
