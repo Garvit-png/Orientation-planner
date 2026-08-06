@@ -206,7 +206,7 @@ function App() {
     return () => clearInterval(timer);
   }, []);
 
-  const bgColor = isDarkMode ? '#121212' : '#FDF1DE';
+  const bgColor = isDarkMode ? '#121212' : '#FFF8E7';
   const textColor = isDarkMode ? '#f8fafc' : '#1a1a1a';
   const navBgColor = isDarkMode ? '#1e1e1e' : '#FBE6D0';
   const secondaryTextColor = isDarkMode ? '#94a3b8' : '#666';
