@@ -6,10 +6,9 @@ import { MOCK_SCHEDULE } from '../data/scheduleData';
 interface EventScheduleProps {
   band: Band;
   tintColor: string;
-  isDarkMode?: boolean;
 }
 
-export default function EventSchedule({ band, tintColor, isDarkMode }: EventScheduleProps) {
+export default function EventSchedule({ band, tintColor }: EventScheduleProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showReminder, setShowReminder] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>('');
@@ -104,7 +103,7 @@ export default function EventSchedule({ band, tintColor, isDarkMode }: EventSche
 
   if (activeEvents.length === 0) {
     return (
-      <div style={{ padding: '3rem 0', textAlign: 'center', color: isDarkMode ? '#cbd5e1' : '#888', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '1rem' }}>
+      <div style={{ padding: '3rem 0', textAlign: 'center', color: '#cbd5e1', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '1rem' }}>
         No upcoming events
       </div>
     );
@@ -217,7 +216,7 @@ export default function EventSchedule({ band, tintColor, isDarkMode }: EventSche
           fontSize: '0.8rem',
           letterSpacing: '2px',
           textTransform: 'uppercase',
-          color: mainStatus === 'LIVE' ? '#ef4444' : (isDarkMode ? '#cbd5e1' : '#334155'),
+          color: mainStatus === 'LIVE' ? '#ef4444' : '#cbd5e1',
           opacity: showReminder ? 1 : 0,
           maxHeight: showReminder ? '50px' : '0',
           padding: showReminder ? '10px 16px' : '0 16px',
@@ -261,7 +260,7 @@ export default function EventSchedule({ band, tintColor, isDarkMode }: EventSche
                 }}>
                   <div style={{
                     fontSize: '0.8rem',
-                    color: !isMainEvent ? '#64748b' : (isDarkMode ? '#f8fafc' : '#0f172a'),
+                    color: !isMainEvent ? '#64748b' : '#f8fafc',
                     fontWeight: '400',
                     fontVariantNumeric: 'tabular-nums',
                     letterSpacing: '0.5px',
@@ -332,7 +331,7 @@ export default function EventSchedule({ band, tintColor, isDarkMode }: EventSche
                   <div style={{
                     fontSize: '1rem',
                     fontWeight: '400',
-                    color: !isMainEvent ? '#64748b' : (isDarkMode ? '#f8fafc' : '#0f172a'),
+                    color: !isMainEvent ? '#64748b' : '#f8fafc',
                     letterSpacing: '0.3px',
                     marginBottom: '0.25rem',
                     lineHeight: 1.3
@@ -342,7 +341,7 @@ export default function EventSchedule({ band, tintColor, isDarkMode }: EventSche
                   {/* Location */}
                   <div style={{
                     fontSize: '0.85rem',
-                    color: isDarkMode ? '#94a3b8' : '#64748b',
+                    color: '#94a3b8',
                     fontWeight: '300'
                   }}>
                     {event.location}

@@ -2,9 +2,7 @@ import { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import EventSchedule from './components/EventSchedule';
 
-function Home({ isDarkMode }: { isDarkMode?: boolean }) {
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
+function Home() {
   const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
 
@@ -19,14 +17,7 @@ function Home({ isDarkMode }: { isDarkMode?: boolean }) {
   }, []);
 
   const handleSelect = (color: string) => {
-    if (isAuthenticating) return;
-    
-    setSelectedColor(color);
-    setIsAuthenticating(true);
-    
-    setTimeout(() => {
-      navigate(`/${color.toLowerCase()}`);
-    }, 1200); // Increased wait time slightly to show the animation
+    navigate(`/${color.toLowerCase()}`);
   };
 
   return (
@@ -54,7 +45,7 @@ function Home({ isDarkMode }: { isDarkMode?: boolean }) {
         fontWeight: '300', 
         letterSpacing: isMobile ? '2px' : '8px',
         textTransform: 'uppercase',
-        color: isDarkMode ? '#FFFFFF' : 'rgba(0, 0, 0, 0.9)',
+        color: '#FFFFFF',
         margin: 0,
         whiteSpace: 'nowrap'
       }}>
@@ -70,7 +61,6 @@ function Home({ isDarkMode }: { isDarkMode?: boolean }) {
       }}>
         <button
           onClick={() => handleSelect('Red')}
-          disabled={isAuthenticating}
           style={{
             padding: '12px 40px',
             fontSize: '1rem',
@@ -81,16 +71,11 @@ function Home({ isDarkMode }: { isDarkMode?: boolean }) {
             backgroundColor: 'rgba(230, 57, 70, 0.8)',
             border: '1px solid rgba(230, 57, 70, 0.5)',
             borderRadius: '4px',
-            cursor: isAuthenticating ? 'not-allowed' : 'pointer',
-            boxShadow: selectedColor === 'Red' 
-              ? '0 0 20px rgba(230, 57, 70, 0.6)' 
-              : 'none',
-            transform: selectedColor === 'Red' ? 'scale(1.05)' : 'scale(1)',
+            cursor: 'pointer',
             transition: 'all 0.3s ease',
             outline: 'none',
             backdropFilter: 'blur(4px)',
-            width: '100%',
-            opacity: isAuthenticating && selectedColor !== 'Red' ? 0.3 : 1
+            width: '100%'
           }}
         >
           Red
@@ -98,7 +83,6 @@ function Home({ isDarkMode }: { isDarkMode?: boolean }) {
 
         <button
           onClick={() => handleSelect('Blue')}
-          disabled={isAuthenticating}
           style={{
             padding: '12px 40px',
             fontSize: '1rem',
@@ -109,42 +93,21 @@ function Home({ isDarkMode }: { isDarkMode?: boolean }) {
             backgroundColor: 'rgba(29, 53, 87, 0.8)',
             border: '1px solid rgba(29, 53, 87, 0.5)',
             borderRadius: '4px',
-            cursor: isAuthenticating ? 'not-allowed' : 'pointer',
-            boxShadow: selectedColor === 'Blue' 
-              ? '0 0 20px rgba(29, 53, 87, 0.6)' 
-              : 'none',
-            transform: selectedColor === 'Blue' ? 'scale(1.05)' : 'scale(1)',
+            cursor: 'pointer',
             transition: 'all 0.3s ease',
             outline: 'none',
             backdropFilter: 'blur(4px)',
-            width: '100%',
-            opacity: isAuthenticating && selectedColor !== 'Blue' ? 0.3 : 1
+            width: '100%'
           }}
         >
           Blue
         </button>
       </div>
-
-      <div style={{ height: '20px', marginTop: '-1rem' }}>
-        {isAuthenticating && (
-          <p style={{
-            margin: 0,
-            fontSize: '0.85rem',
-            fontWeight: '400',
-            letterSpacing: '6px',
-            textTransform: 'uppercase',
-            color: selectedColor === 'Red' ? '#ff8787' : '#74c0fc',
-            animation: 'blink-fast 0.8s infinite ease-in-out'
-          }}>
-            Establishing Connection...
-          </p>
-        )}
-      </div>
     </div>
   );
 }
 
-function BandPage({ color, isDarkMode }: { color: 'red' | 'blue', isDarkMode?: boolean }) {
+function BandPage({ color }: { color: 'red' | 'blue' }) {
   const [isMobile, setIsMobile] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   
@@ -155,21 +118,60 @@ function BandPage({ color, isDarkMode }: { color: 'red' | 'blue', isDarkMode?: b
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
-    const timer = setTimeout(() => {
+    // Simulate loading on the new page
+    setTimeout(() => {
       setIsLoaded(true);
-    }, 600);
+    }, 1500);
 
     return () => {
       window.removeEventListener('resize', checkMobile);
-      clearTimeout(timer);
     };
   }, []);
 
-  const isRed = color === 'red';
-  const isBlue = color === 'blue';
-  
-  const tintColor = isRed ? '#ff3333' : isBlue ? '#3388ff' : '#ffffff';
-  const bandType = isRed ? 'Red' : 'Blue';
+  const tintColor = color === 'red' ? '#ef4444' : '#3b82f6';
+  const bandType = color === 'red' ? 'Red' : 'Blue';
+
+  if (!isLoaded) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+        width: '100%',
+        gap: '20px'
+      }}>
+        <div style={{
+          width: '40px',
+          height: '40px',
+          border: `3px solid ${tintColor}30`,
+          borderTop: `3px solid ${tintColor}`,
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }}></div>
+        <div style={{
+          color: tintColor,
+          letterSpacing: '4px',
+          textTransform: 'uppercase',
+          fontSize: '0.85rem',
+          animation: 'pulse 1.5s infinite'
+        }}>
+          Loading...
+        </div>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+          @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   return (
     <div style={{
@@ -180,16 +182,13 @@ function BandPage({ color, isDarkMode }: { color: 'red' | 'blue', isDarkMode?: b
       flexDirection: 'column',
       padding: isMobile ? '0' : '0 3rem',
       width: '100vw',
-      opacity: isLoaded ? 1 : 0,
-      transform: isLoaded ? 'translateY(0)' : 'translateY(10px)',
-      transition: 'all 0.6s ease',
       height: '100%',
       boxSizing: 'border-box'
     }}>
 
       {/* Schedule UI */}
       <div style={{ flex: 1, width: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        <EventSchedule band={bandType} tintColor={tintColor} isDarkMode={isDarkMode} />
+        <EventSchedule band={bandType} tintColor={tintColor} />
       </div>
     </div>
   );
@@ -197,7 +196,6 @@ function BandPage({ color, isDarkMode }: { color: 'red' | 'blue', isDarkMode?: b
 
 function App() {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -206,11 +204,11 @@ function App() {
     return () => clearInterval(timer);
   }, []);
 
-  const bgColor = isDarkMode ? '#121212' : '#FEF5E8';
-  const textColor = isDarkMode ? '#f8fafc' : '#1a1a1a';
-  const navBgColor = isDarkMode ? '#1e1e1e' : '#FBE6D0';
-  const secondaryTextColor = isDarkMode ? '#94a3b8' : '#666';
-  const buttonBgColor = isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+  const bgColor = '#121212';
+  const textColor = '#f8fafc';
+  const navBgColor = '#1e1e1e';
+  const secondaryTextColor = '#94a3b8';
+  const buttonBgColor = 'rgba(255,255,255,0.1)';
 
   return (
     <div style={{
@@ -233,7 +231,7 @@ function App() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        boxShadow: isDarkMode ? '0 2px 4px rgba(0,0,0,0.2)' : '0 2px 4px rgba(0,0,0,0.05)',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
         zIndex: 50,
         transition: 'background-color 0.3s ease'
       }}>
@@ -242,7 +240,7 @@ function App() {
           <img 
             src="/new_logo.png" 
             alt="Logo" 
-            style={{ width: '26px', height: 'auto', filter: isDarkMode ? 'brightness(0.9)' : 'none' }} 
+            style={{ width: '26px', height: 'auto', filter: 'brightness(0.9)' }} 
           />
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontWeight: '600', fontSize: '0.7rem', color: textColor }}>RU Orientation Portal</span>
@@ -257,22 +255,14 @@ function App() {
             <div style={{ width: '4px', height: '4px', backgroundColor: '#ef4444', borderRadius: '50%' }}></div>
             {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
           </div>
-
-          {/* Toggle Button */}
-          <button 
-            onClick={() => setIsDarkMode(!isDarkMode)}
-            style={{ background: buttonBgColor, color: textColor, border: 'none', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '0.75rem', transition: 'background-color 0.2s ease' }}
-          >
-            {isDarkMode ? '☀' : '☾'}
-          </button>
         </div>
       </div>
 
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
         <Routes>
-        <Route path="/" element={<Home isDarkMode={isDarkMode} />} />
-        <Route path="/red" element={<BandPage color="red" isDarkMode={isDarkMode} />} />
-        <Route path="/blue" element={<BandPage color="blue" isDarkMode={isDarkMode} />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/red" element={<BandPage color="red" />} />
+        <Route path="/blue" element={<BandPage color="blue" />} />
         </Routes>
       </div>
     </div>
